@@ -12,41 +12,45 @@
 #include "os.h"
 #include "switch.h"
 
+volatile static bool g_PwmSignal = 0u;
 
-volatile static bool g_PwmSignal = 0u; 
+static uint8_t PwmWidth = 0U;
+static int8_t temp = 1;
 
-
-/*******************************************************************************
- * TODO: 
- * Add your needed shared variables 
- ******************************************************************************/
-
-/*******************************************************************************
- * TODO: 
- * Add the tasks & callback prototypes (DeclareTask(XX))
- ******************************************************************************/
-
+DeclareTask(AppTask_PulseWidthUpdate)
+DeclareTask(AppTask_PwmOn)
 
 void SystemInit(void) {}
-int main(void) {
+int main(void)
+{
   StartOS();
   while (1)
     ; /* Should not be executed */
   return 0;
 }
 
-/*******************************************************************************
- * TODO: 
- * Add your implementation for AppTask_PulseWidthUpdate task 
- ******************************************************************************/
+TASK(AppTask_PulseWidthUpdate)
+{
+  if (PwmWidth + temp >= 10)
+  {
+    temp = -1;
+  }
+  else if (PwmWidth + temp <= 0)
+  {
+    temp = 1;
+  }
+  PwmWidth += temp;
+  TerminateTask();
+}
 
-/*******************************************************************************
- * TODO: 
- * Add your implementation for AppTask_PwmOn task 
- ******************************************************************************/
+TASK(AppTask_PwmOn)
+{
+  g_PwmSignal = 1u;
+	SetRelAlarm(Alrm_PwmOff, PwmWidth, 0); 
+  TerminateTask();
+}
 
-/*******************************************************************************
- * TODO: 
- * Add your implementation for PwmOff callback 
- ******************************************************************************/
-
+ALARMCALLBACK(PwmOff)
+{
+  g_PwmSignal = 0u;
+}
