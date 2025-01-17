@@ -27,21 +27,47 @@ CPU CORTEX-M4 {
       USERESSCHEDULER = FALSE;
       SYSTEMTICKMS = 10 ; 
    };
-   TASK /*REPLACE WITH TASK ID */{
-      /*REPLACE THE TASK ATTRIBUTES */
-   };         
-   TASK /*REPLACE WITH TASK ID */{
-      /*REPLACE THE TASK ATTRIBUTES */
+   TASK AppTask_PulseWidthUpdate {
+      PRIORITY = 20;
+      SCHEDULE = FULL;
+      ACTIVATION = 1;
+      AUTOSTART = FALSE
+      STACKSIZE = 50;
+        };         
+   TASK AppTask_PwmOn {
+      PRIORITY = 15;
+      SCHEDULE = FULL;
+      ACTIVATION = 1;
+      AUTOSTART = FALSE
+      STACKSIZE = 50;
    }; 
-   ALARM /*REPLACE WITH ALARM ID */ {
-      /*REPLACE THE ALARM ATTRIBUTES */
+   ALARM Alrm_PulseWidthUpdate {
+      COUNTER = MainCounter;
+      ACTION = ACTIVATETASK  {
+         TASK = AppTask_PulseWidthUpdate;
+      };
+      AUTOSTART = TRUE {
+         ALARMTIME = 500; 
+         CYCLETIME = 50; 
+      };
    };
-   ALARM /*REPLACE WITH ALARM ID */ {
-      /*REPLACE THE ALARM ATTRIBUTES */
+   ALARM Alrm_PwmOn {
+      COUNTER = MainCounter;
+      ACTION = ACTIVATETASK  {
+         TASK = AppTask_PwmOn;
+      };
+      AUTOSTART = TRUE {
+         ALARMTIME = 500; 
+         CYCLETIME = 10; 
+      };
    };       
-   ALARM /*REPLACE WITH ALARM ID */ {
-      /*REPLACE THE ALARM ATTRIBUTES */ 
-   };      
+   ALARM Alrm_PwmOff {
+      COUNTER = MainCounter;
+      ACTION = ALARMCALLBACK  {
+         ALARMCALLBACKNAME = "PwmOff";
+      };
+      AUTOSTART = FALSE
+   }  
    COUNTER MainCounter {
       MINCYCLE = 1;
       MAXALLOWEDVALUE = 0xFFFFFFFF;
